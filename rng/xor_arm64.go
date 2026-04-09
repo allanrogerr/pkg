@@ -1,4 +1,4 @@
-// Copyright (c) 2015-2021 MinIO, Inc.
+// Copyright (c) 2015-2026 MinIO, Inc.
 //
 // This file is part of MinIO Object Storage stack
 //
@@ -19,18 +19,9 @@
 
 package rng
 
-import "github.com/klauspost/cpuid/v2"
-
 func xorSlice(in, out []byte, v *[4]uint64) {
-	if cpuid.CPU.Has(cpuid.AVX2) {
-		xorSliceAvx2(in, out, v)
-	} else {
-		xorSliceSSE2(in, out, v)
-	}
+	xorSliceNEON(in, out, v)
 }
 
 //go:noescape
-func xorSliceSSE2(in, out []byte, v *[4]uint64)
-
-//go:noescape
-func xorSliceAvx2(in, out []byte, v *[4]uint64)
+func xorSliceNEON(in, out []byte, v *[4]uint64)
