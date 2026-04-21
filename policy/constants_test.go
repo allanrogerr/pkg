@@ -106,7 +106,10 @@ func TestDefaultPolicyConsoleReadOnlyAllowsListBucket(t *testing.T) {
 		t.Error("consolereadonly should allow s3:ListBucket")
 	}
 
-	ro, _ := findDefaultPolicy("readonly")
+	ro, ok := findDefaultPolicy("readonly")
+	if !ok {
+		t.Fatal("readonly default policy not found")
+	}
 	if ro.IsAllowed(args) {
 		t.Error("readonly should NOT allow s3:ListBucket (sanity check)")
 	}
