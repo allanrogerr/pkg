@@ -1,6 +1,4 @@
-//go:build !linux
-
-// Copyright (c) 2015-2021 MinIO, Inc.
+// Copyright (c) 2015-2026 MinIO, Inc.
 //
 // This file is part of MinIO Object Storage stack
 //
@@ -17,9 +15,13 @@
 // You should have received a copy of the GNU Affero General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package certs
+//go:build !noasm && !appengine && !gccgo && !purego
 
-import "github.com/rjeczalik/notify"
+package rng
 
-// eventWrite contains the notify events that will cause a write
-var eventWrite = []notify.Event{notify.Create, notify.Write, notify.Rename}
+func xorSlice(in, out []byte, v *[4]uint64) {
+	xorSliceNEON(in, out, v)
+}
+
+//go:noescape
+func xorSliceNEON(in, out []byte, v *[4]uint64)

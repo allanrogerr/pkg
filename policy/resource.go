@@ -98,9 +98,6 @@ func (r Resource) isTable() bool {
 	return r.Type == ResourceARNS3Tables || r.Type == ResourceARNAll
 }
 
-// AIStorTableTag is the tag used to identify an S3 prefix as underlying store for AIStor tables.
-const AIStorTableTag = "--table-aistor"
-
 func (r Resource) isBucketPattern() bool {
 	return !strings.Contains(r.Pattern, "/") || r.Pattern == "*"
 }
@@ -296,5 +293,33 @@ func NewKMSResource(pattern string) Resource {
 	return Resource{
 		Pattern: pattern,
 		Type:    ResourceARNKMS,
+	}
+}
+
+// isTableResourceString reports whether s has the form
+// bucket/<bucket-name>/(table|view)[/<id>].
+func isTableResourceString(s string) bool {
+	if !strings.HasPrefix(s, "bucket/") {
+		return false
+	}
+	rest := strings.TrimPrefix(s, "bucket/")
+	parts := strings.Split(rest, "/")
+	if len(parts) < 2 || len(parts) > 3 {
+		return false
+	}
+	if parts[0] == "" {
+		return false
+	}
+	if parts[1] != "table" && parts[1] != "view" {
+		return false
+	}
+	return true
+}
+
+// NewS3TablesResource - creates new resource with type S3 Tables
+func NewS3TablesResource(pattern string) Resource {
+	return Resource{
+		Pattern: pattern,
+		Type:    ResourceARNS3Tables,
 	}
 }

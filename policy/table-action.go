@@ -82,6 +82,9 @@ const (
 	// S3TablesPutTablePolicyAction maps to the AWS `PutTablePolicy` S3 Tables action.
 	S3TablesPutTablePolicyAction = "s3tables:PutTablePolicy"
 
+	// S3TablesRegisterTableAction maps to the AWS `RegisterTable` S3 Tables action.
+	S3TablesRegisterTableAction = "s3tables:RegisterTable"
+
 	// S3TablesRenameTableAction maps to the AWS `RenameTable` S3 Tables action.
 	S3TablesRenameTableAction = "s3tables:RenameTable"
 
@@ -172,9 +175,6 @@ const (
 	// Prefer using S3TablesPutWarehousePolicyAction instead.
 	S3TablesPutTableBucketPolicyAction = "s3tables:PutTableBucketPolicy"
 
-	// S3TablesCommitMultiTableTransactionAction is a MinIO extension enabling multi-table transactions.
-	S3TablesCommitMultiTableTransactionAction = "s3tables:CommitMultiTableTransaction"
-
 	// S3TablesGetConfigAction is a MinIO extension for retrieving catalog configuration.
 	S3TablesGetConfigAction = "s3tables:GetConfig"
 
@@ -183,6 +183,37 @@ const (
 
 	// S3TablesUpdateTableAction is a MinIO extension for Iceberg-compatible table updates.
 	S3TablesUpdateTableAction = "s3tables:UpdateTable"
+
+	// S3TablesCreateViewAction is a MinIO extension for creating Iceberg views.
+	S3TablesCreateViewAction = "s3tables:CreateView"
+
+	// S3TablesDeleteViewAction is a MinIO extension for deleting Iceberg views.
+	S3TablesDeleteViewAction = "s3tables:DeleteView"
+
+	// S3TablesGetViewAction is a MinIO extension for retrieving Iceberg views.
+	S3TablesGetViewAction = "s3tables:GetView"
+
+	// S3TablesRenameViewAction is a MinIO extension for renaming Iceberg views.
+	S3TablesRenameViewAction = "s3tables:RenameView"
+
+	// S3TablesUpdateViewAction is a MinIO extension for updating Iceberg views.
+	S3TablesUpdateViewAction = "s3tables:UpdateView"
+
+	// S3TablesListViewsAction is a MinIO extension for listing Iceberg views.
+	S3TablesListViewsAction = "s3tables:ListViews"
+
+	// S3TablesRegisterViewAction is a MinIO extension for registering Iceberg views.
+	S3TablesRegisterViewAction = "s3tables:RegisterView"
+
+	// S3TablesUpdateNamespacePropertiesAction is a MinIO extension for updating namespace properties.
+	S3TablesUpdateNamespacePropertiesAction = "s3tables:UpdateNamespaceProperties"
+
+	// S3TablesTagResourceAction maps to the AWS `s3tables:TagResource` action.
+	S3TablesTagResourceAction = "s3tables:TagResource"
+	// S3TablesUntagResourceAction maps to the AWS `s3tables:UntagResource` action.
+	S3TablesUntagResourceAction = "s3tables:UntagResource"
+	// S3TablesListTagsForResourceAction maps to the AWS `s3tables:ListTagsForResource` action.
+	S3TablesListTagsForResourceAction = "s3tables:ListTagsForResource"
 
 	// AllS3TablesActions - all Amazon S3 Tables actions
 	AllS3TablesActions = "s3tables:*"
@@ -221,6 +252,7 @@ var SupportedTableActions = map[TableAction]struct{}{
 	S3TablesPutTableEncryptionAction:                     {},
 	S3TablesPutTableMaintenanceConfigurationAction:       {},
 	S3TablesPutTablePolicyAction:                         {},
+	S3TablesRegisterTableAction:                          {},
 	S3TablesRenameTableAction:                            {},
 	S3TablesUpdateTableMetadataLocationAction:            {},
 	S3TablesCreateWarehouseAction:                        {},
@@ -235,10 +267,20 @@ var SupportedTableActions = map[TableAction]struct{}{
 	S3TablesPutWarehouseEncryptionAction:                 {},
 	S3TablesPutWarehouseMaintenanceConfigurationAction:   {},
 	S3TablesPutWarehousePolicyAction:                     {},
-	S3TablesCommitMultiTableTransactionAction:            {},
 	S3TablesGetConfigAction:                              {},
 	S3TablesTableMetricsAction:                           {},
 	S3TablesUpdateTableAction:                            {},
+	S3TablesCreateViewAction:                             {},
+	S3TablesDeleteViewAction:                             {},
+	S3TablesGetViewAction:                                {},
+	S3TablesRenameViewAction:                             {},
+	S3TablesUpdateViewAction:                             {},
+	S3TablesListViewsAction:                              {},
+	S3TablesRegisterViewAction:                           {},
+	S3TablesUpdateNamespacePropertiesAction:              {},
+	S3TablesTagResourceAction:                            {},
+	S3TablesUntagResourceAction:                          {},
+	S3TablesListTagsForResourceAction:                    {},
 	AllS3TablesActions:                                   {},
 }
 
@@ -256,8 +298,10 @@ func createTableActionConditionKeyMap() map[Action]condition.KeySet {
 
 	s3TablesNamespaceKey := condition.S3TablesNamespace.ToKey()
 	s3TablesTableNameKey := condition.S3TablesTableName.ToKey()
+	s3TablesViewNameKey := condition.S3TablesViewName.ToKey()
 	s3TablesKMSKeyKey := condition.S3TablesKMSKeyArn.ToKey()
 	s3TablesSSEAlgorithmKey := condition.S3TablesSSEAlgorithm.ToKey()
+	s3TablesRegisterLocationKey := condition.S3TablesRegisterLocation.ToKey()
 
 	withCommon := func(keys ...condition.Key) condition.KeySet {
 		merged := append([]condition.Key{}, commonKeys...)
@@ -274,11 +318,13 @@ func createTableActionConditionKeyMap() map[Action]condition.KeySet {
 	tableActionConditionKeyMap[AllS3TablesActions] = withCommon(
 		s3TablesNamespaceKey,
 		s3TablesTableNameKey,
+		s3TablesViewNameKey,
 		s3TablesKMSKeyKey,
 		s3TablesSSEAlgorithmKey,
+		s3TablesRegisterLocationKey,
 	)
-	tableActionConditionKeyMap[S3TablesCreateNamespaceAction] = withCommon()
-	tableActionConditionKeyMap[S3TablesCreateTableAction] = withCommon(s3TablesNamespaceKey, s3TablesKMSKeyKey, s3TablesSSEAlgorithmKey)
+	tableActionConditionKeyMap[S3TablesCreateNamespaceAction] = withCommon(s3TablesNamespaceKey)
+	tableActionConditionKeyMap[S3TablesCreateTableAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey, s3TablesKMSKeyKey, s3TablesSSEAlgorithmKey)
 	tableActionConditionKeyMap[S3TablesCreateTableBucketAction] = withCommon(s3TablesKMSKeyKey, s3TablesSSEAlgorithmKey)
 	tableActionConditionKeyMap[S3TablesDeleteNamespaceAction] = withCommon(s3TablesNamespaceKey)
 	tableActionConditionKeyMap[S3TablesDeleteTableAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
@@ -298,16 +344,17 @@ func createTableActionConditionKeyMap() map[Action]condition.KeySet {
 	tableActionConditionKeyMap[S3TablesGetTableMaintenanceJobStatusAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
 	tableActionConditionKeyMap[S3TablesGetTableMetadataLocationAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
 	tableActionConditionKeyMap[S3TablesGetTablePolicyAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
-	tableActionConditionKeyMap[S3TablesListNamespacesAction] = withCommon()
+	tableActionConditionKeyMap[S3TablesListNamespacesAction] = withCommon(s3TablesNamespaceKey)
 	tableActionConditionKeyMap[S3TablesListTableBucketsAction] = withCommon()
 	tableActionConditionKeyMap[S3TablesListTablesAction] = withCommon(s3TablesNamespaceKey)
 	tableActionConditionKeyMap[S3TablesPutTableBucketEncryptionAction] = withCommon(s3TablesKMSKeyKey, s3TablesSSEAlgorithmKey)
 	tableActionConditionKeyMap[S3TablesPutTableBucketMaintenanceConfigurationAction] = withCommon()
 	tableActionConditionKeyMap[S3TablesPutTableBucketPolicyAction] = withCommon()
 	tableActionConditionKeyMap[S3TablesPutTableDataAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
-	tableActionConditionKeyMap[S3TablesPutTableEncryptionAction] = withCommon(s3TablesNamespaceKey, s3TablesKMSKeyKey, s3TablesSSEAlgorithmKey)
+	tableActionConditionKeyMap[S3TablesPutTableEncryptionAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey, s3TablesKMSKeyKey, s3TablesSSEAlgorithmKey)
 	tableActionConditionKeyMap[S3TablesPutTableMaintenanceConfigurationAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
 	tableActionConditionKeyMap[S3TablesPutTablePolicyAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
+	tableActionConditionKeyMap[S3TablesRegisterTableAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey, s3TablesRegisterLocationKey)
 	tableActionConditionKeyMap[S3TablesRenameTableAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
 	tableActionConditionKeyMap[S3TablesUpdateTableMetadataLocationAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
 	tableActionConditionKeyMap[S3TablesCreateWarehouseAction] = withCommon(s3TablesKMSKeyKey, s3TablesSSEAlgorithmKey)
@@ -322,10 +369,20 @@ func createTableActionConditionKeyMap() map[Action]condition.KeySet {
 	tableActionConditionKeyMap[S3TablesPutWarehouseEncryptionAction] = withCommon(s3TablesKMSKeyKey, s3TablesSSEAlgorithmKey)
 	tableActionConditionKeyMap[S3TablesPutWarehouseMaintenanceConfigurationAction] = withCommon()
 	tableActionConditionKeyMap[S3TablesPutWarehousePolicyAction] = withCommon()
-	tableActionConditionKeyMap[S3TablesCommitMultiTableTransactionAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
 	tableActionConditionKeyMap[S3TablesGetConfigAction] = withCommon()
 	tableActionConditionKeyMap[S3TablesTableMetricsAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
 	tableActionConditionKeyMap[S3TablesUpdateTableAction] = withCommon(s3TablesNamespaceKey, s3TablesTableNameKey)
+	tableActionConditionKeyMap[S3TablesCreateViewAction] = withCommon(s3TablesNamespaceKey, s3TablesViewNameKey)
+	tableActionConditionKeyMap[S3TablesDeleteViewAction] = withCommon(s3TablesNamespaceKey, s3TablesViewNameKey)
+	tableActionConditionKeyMap[S3TablesGetViewAction] = withCommon(s3TablesNamespaceKey, s3TablesViewNameKey)
+	tableActionConditionKeyMap[S3TablesRenameViewAction] = withCommon(s3TablesNamespaceKey, s3TablesViewNameKey)
+	tableActionConditionKeyMap[S3TablesUpdateViewAction] = withCommon(s3TablesNamespaceKey, s3TablesViewNameKey)
+	tableActionConditionKeyMap[S3TablesRegisterViewAction] = withCommon(s3TablesNamespaceKey, s3TablesViewNameKey, s3TablesRegisterLocationKey)
+	tableActionConditionKeyMap[S3TablesListViewsAction] = withCommon(s3TablesNamespaceKey)
+	tableActionConditionKeyMap[S3TablesUpdateNamespacePropertiesAction] = withCommon(s3TablesNamespaceKey)
+	tableActionConditionKeyMap[S3TablesTagResourceAction] = withCommon()
+	tableActionConditionKeyMap[S3TablesUntagResourceAction] = withCommon()
+	tableActionConditionKeyMap[S3TablesListTagsForResourceAction] = withCommon()
 
 	return tableActionConditionKeyMap
 }

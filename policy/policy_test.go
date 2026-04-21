@@ -2280,7 +2280,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     GetObjectAction,
 				BucketName: "my-warehouse",
-				ObjectName: "table-uuid-123--table-aistor",
+				ObjectName: "table-uuid-123",
 			},
 			expectedResult: true,
 			description:    "GetObject (implicit from GetTableData) should match when resource is converted from S3 to S3Tables format",
@@ -2291,7 +2291,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     GetObjectAction,
 				BucketName: "my-warehouse",
-				ObjectName: "table-uuid-123--table-aistor/data/file.parquet",
+				ObjectName: "table-uuid-123/data/file.parquet",
 			},
 			expectedResult: true,
 			description:    "GetObject should match even with extra path segments (should be discarded in conversion)",
@@ -2302,7 +2302,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     ListMultipartUploadPartsAction,
 				BucketName: "my-warehouse",
-				ObjectName: "table-uuid-123--table-aistor",
+				ObjectName: "table-uuid-123",
 			},
 			expectedResult: true,
 			description:    "ListMultipartUploadParts (implicit from GetTableData) should match with resource conversion",
@@ -2313,7 +2313,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     GetObjectAction,
 				BucketName: "wrong-warehouse",
-				ObjectName: "table-uuid-123--table-aistor",
+				ObjectName: "table-uuid-123",
 			},
 			expectedResult: false,
 			description:    "Should not match when warehouse name doesn't match",
@@ -2324,7 +2324,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     GetObjectAction,
 				BucketName: "my-warehouse",
-				ObjectName: "wrong-uuid--table-aistor",
+				ObjectName: "wrong-uuid",
 			},
 			expectedResult: false,
 			description:    "Should not match when table UUID doesn't match",
@@ -2345,7 +2345,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     PutObjectAction,
 				BucketName: "test-warehouse",
-				ObjectName: "uuid-456--table-aistor",
+				ObjectName: "uuid-456",
 			},
 			expectedResult: true,
 			description:    "PutObject (implicit from PutTableData) should match with resource conversion",
@@ -2356,7 +2356,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     AbortMultipartUploadAction,
 				BucketName: "test-warehouse",
-				ObjectName: "uuid-456--table-aistor/upload",
+				ObjectName: "uuid-456/upload",
 			},
 			expectedResult: true,
 			description:    "AbortMultipartUpload (implicit from PutTableData) should match",
@@ -2367,7 +2367,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     GetObjectAction,
 				BucketName: "wh",
-				ObjectName: "id--table-aistor",
+				ObjectName: "id",
 			},
 			expectedResult: true,
 			description:    "Should match with multiple S3 Tables actions in statement",
@@ -2378,7 +2378,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     PutObjectAction,
 				BucketName: "wh",
-				ObjectName: "id--table-aistor",
+				ObjectName: "id",
 			},
 			expectedResult: true,
 			description:    "Should match PutObject when both GetTableData and PutTableData are allowed",
@@ -2389,7 +2389,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     DeleteObjectAction,
 				BucketName: "my-warehouse",
-				ObjectName: "table-uuid-123--table-aistor",
+				ObjectName: "table-uuid-123",
 			},
 			expectedResult: false,
 			description:    "DeleteObject is not implicit from GetTableData, should not match",
@@ -2400,7 +2400,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     GetObjectAction,
 				BucketName: "all-warehouse",
-				ObjectName: "all-uuid--table-aistor",
+				ObjectName: "all-uuid",
 			},
 			expectedResult: true,
 			description:    "s3tables:* should allow GetObject through implicit matching with resource conversion",
@@ -2411,7 +2411,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     PutObjectAction,
 				BucketName: "all-warehouse",
-				ObjectName: "all-uuid--table-aistor",
+				ObjectName: "all-uuid",
 			},
 			expectedResult: true,
 			description:    "s3tables:* should allow PutObject through implicit matching",
@@ -2422,7 +2422,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     ListMultipartUploadPartsAction,
 				BucketName: "all-warehouse",
-				ObjectName: "all-uuid--table-aistor",
+				ObjectName: "all-uuid",
 			},
 			expectedResult: true,
 			description:    "s3tables:* should allow ListMultipartUploadParts through implicit matching",
@@ -2433,7 +2433,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     AbortMultipartUploadAction,
 				BucketName: "all-warehouse",
-				ObjectName: "all-uuid--table-aistor",
+				ObjectName: "all-uuid",
 			},
 			expectedResult: true,
 			description:    "s3tables:* should allow AbortMultipartUpload through implicit matching",
@@ -2444,7 +2444,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     GetObjectAction,
 				BucketName: "all-warehouse",
-				ObjectName: "all-uuid--table-aistor/extra/path/data.parquet",
+				ObjectName: "all-uuid/extra/path/data.parquet",
 			},
 			expectedResult: true,
 			description:    "s3tables:* should match with extra path segments discarded",
@@ -2455,7 +2455,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     GetObjectAction,
 				BucketName: "wrong-warehouse",
-				ObjectName: "all-uuid--table-aistor",
+				ObjectName: "all-uuid",
 			},
 			expectedResult: false,
 			description:    "s3tables:* should not match when warehouse name is wrong",
@@ -2466,7 +2466,7 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 			args: Args{
 				Action:     PutObjectAction,
 				BucketName: "all-warehouse",
-				ObjectName: "wrong-uuid--table-aistor",
+				ObjectName: "wrong-uuid",
 			},
 			expectedResult: false,
 			description:    "s3tables:* should not match when table UUID is wrong",
@@ -2485,5 +2485,412 @@ func TestS3TablesActionsWithImplicitMatching(t *testing.T) {
 				t.Errorf("%s: expected %v, got %v", tc.description, tc.expectedResult, result)
 			}
 		})
+	}
+}
+
+func TestPolicyParseS3VectorsExamples(t *testing.T) {
+	tests := []struct {
+		name              string
+		policyJSON        string
+		expectedActions   []Action
+		expectedResources []string
+	}{
+		{
+			name: "VectorBucketFullAccess",
+			policyJSON: `{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3vectors:CreateVectorBucket",
+        "s3vectors:DeleteVectorBucket",
+        "s3vectors:GetVectorBucket",
+        "s3vectors:ListVectorBuckets"
+      ],
+      "Resource": "arn:aws:s3:::vectors-bucket/*"
+    }
+  ]
+}`,
+			expectedActions: []Action{
+				Action(S3VectorsCreateVectorBucketAction),
+				Action(S3VectorsDeleteVectorBucketAction),
+				Action(S3VectorsGetVectorBucketAction),
+				Action(S3VectorsListVectorBucketsAction),
+			},
+			expectedResources: []string{"arn:aws:s3:::vectors-bucket/*"},
+		},
+		{
+			name: "IndexOperations",
+			policyJSON: `{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3vectors:CreateIndex",
+        "s3vectors:DeleteIndex",
+        "s3vectors:GetIndex",
+        "s3vectors:ListIndexes"
+      ],
+      "Resource": "arn:aws:s3:::vectors-bucket/*"
+    }
+  ]
+}`,
+			expectedActions: []Action{
+				Action(S3VectorsCreateIndexAction),
+				Action(S3VectorsDeleteIndexAction),
+				Action(S3VectorsGetIndexAction),
+				Action(S3VectorsListIndexesAction),
+			},
+			expectedResources: []string{"arn:aws:s3:::vectors-bucket/*"},
+		},
+		{
+			name: "VectorDataOperations",
+			policyJSON: `{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3vectors:PutVectors",
+        "s3vectors:GetVectors",
+        "s3vectors:DeleteVectors",
+        "s3vectors:ListVectors",
+        "s3vectors:QueryVectors"
+      ],
+      "Resource": "arn:aws:s3:::vectors-bucket/*"
+    }
+  ]
+}`,
+			expectedActions: []Action{
+				Action(S3VectorsPutVectorsAction),
+				Action(S3VectorsGetVectorsAction),
+				Action(S3VectorsDeleteVectorsAction),
+				Action(S3VectorsListVectorsAction),
+				Action(S3VectorsQueryVectorsAction),
+			},
+			expectedResources: []string{"arn:aws:s3:::vectors-bucket/*"},
+		},
+		{
+			name: "AllVectorsActions",
+			policyJSON: `{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3vectors:*",
+      "Resource": "arn:aws:s3:::vectors-bucket/*"
+    }
+  ]
+}`,
+			expectedActions:   []Action{Action(AllS3VectorsActions)},
+			expectedResources: []string{"arn:aws:s3:::vectors-bucket/*"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p, err := ParseConfig(strings.NewReader(tt.policyJSON))
+			if err != nil {
+				t.Fatalf("failed to parse policy: %v", err)
+			}
+
+			if len(p.Statements) != 1 {
+				t.Fatalf("expected 1 statement, got %d", len(p.Statements))
+			}
+
+			stmt := p.Statements[0]
+
+			// Check actions
+			if len(stmt.Actions) != len(tt.expectedActions) {
+				t.Errorf("expected %d actions, got %d", len(tt.expectedActions), len(stmt.Actions))
+			}
+			for _, expectedAction := range tt.expectedActions {
+				if !stmt.Actions.Contains(expectedAction) {
+					t.Errorf("expected action %v not found in statement", expectedAction)
+				}
+			}
+
+			// Check resources
+			if len(stmt.Resources) != len(tt.expectedResources) {
+				t.Errorf("expected %d resources, got %d", len(tt.expectedResources), len(stmt.Resources))
+			}
+			for _, expectedResource := range tt.expectedResources {
+				found := false
+				for r := range stmt.Resources {
+					if r.String() == expectedResource {
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Errorf("expected resource %v not found in statement", expectedResource)
+				}
+			}
+		})
+	}
+}
+
+func TestS3VectorsActionsAllowed(t *testing.T) {
+	policyJSON := `{
+		"Version": "2012-10-17",
+		"Statement": [
+			{
+				"Effect": "Allow",
+				"Action": ["s3vectors:*"],
+				"Resource": ["arn:aws:s3:::vectors-bucket/*"]
+			}
+		]
+	}`
+
+	testCases := []struct {
+		name           string
+		args           Args
+		expectedResult bool
+		description    string
+	}{
+		{
+			name: "CreateVectorBucket allowed",
+			args: Args{
+				Action:     Action(S3VectorsCreateVectorBucketAction),
+				BucketName: "vectors-bucket",
+				ObjectName: "my-vector-bucket",
+			},
+			expectedResult: true,
+			description:    "CreateVectorBucket should be allowed with s3vectors:*",
+		},
+		{
+			name: "ListIndexes allowed",
+			args: Args{
+				Action:     Action(S3VectorsListIndexesAction),
+				BucketName: "vectors-bucket",
+				ObjectName: "my-vector-bucket/indexes",
+			},
+			expectedResult: true,
+			description:    "ListIndexes should be allowed with s3vectors:*",
+		},
+		{
+			name: "PutVectors allowed",
+			args: Args{
+				Action:     Action(S3VectorsPutVectorsAction),
+				BucketName: "vectors-bucket",
+				ObjectName: "my-vector-bucket/index/my-index",
+			},
+			expectedResult: true,
+			description:    "PutVectors should be allowed with s3vectors:*",
+		},
+		{
+			name: "QueryVectors allowed",
+			args: Args{
+				Action:     Action(S3VectorsQueryVectorsAction),
+				BucketName: "vectors-bucket",
+				ObjectName: "my-vector-bucket/index/my-index",
+			},
+			expectedResult: true,
+			description:    "QueryVectors should be allowed with s3vectors:*",
+		},
+		{
+			name: "Wrong bucket not allowed",
+			args: Args{
+				Action:     Action(S3VectorsCreateVectorBucketAction),
+				BucketName: "wrong-bucket",
+				ObjectName: "my-vector-bucket",
+			},
+			expectedResult: false,
+			description:    "CreateVectorBucket should not be allowed on wrong bucket",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			p, err := ParseConfig(strings.NewReader(policyJSON))
+			if err != nil {
+				t.Fatalf("failed to parse policy: %v", err)
+			}
+
+			result := p.IsAllowed(tc.args)
+			if result != tc.expectedResult {
+				t.Errorf("%s: expected %v, got %v", tc.description, tc.expectedResult, result)
+			}
+		})
+	}
+}
+
+func TestAdminActionResourceScoping(t *testing.T) {
+	// Policy that scopes GetBucketQuota to a specific bucket via Resource.
+	scopedPolicy := `{
+ "Version": "2012-10-17",
+ "Statement": [
+  {
+   "Effect": "Allow",
+   "Action": ["admin:GetBucketQuota"],
+   "Resource": ["arn:aws:s3:::mybucket"]
+  }
+ ]
+}`
+	p, err := ParseConfig(strings.NewReader(scopedPolicy))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Matching bucket must be allowed.
+	allowed := p.IsAllowedActions("mybucket", "", map[string][]string{})
+	if !allowed.Match(GetBucketQuotaAdminAction) {
+		t.Fatal("expected GetBucketQuota allowed for mybucket")
+	}
+
+	// Different bucket must be denied.
+	allowed = p.IsAllowedActions("otherbucket", "", map[string][]string{})
+	if allowed.Match(GetBucketQuotaAdminAction) {
+		t.Fatal("expected GetBucketQuota denied for otherbucket")
+	}
+
+	// Resource-less admin actions ignore Resource even if specified.
+	resourcelessPolicy := `{
+ "Version": "2012-10-17",
+ "Statement": [
+  {
+   "Effect": "Allow",
+   "Action": ["admin:ServerInfo"]
+  }
+ ]
+}`
+	p, err = ParseConfig(strings.NewReader(resourcelessPolicy))
+	if err != nil {
+		t.Fatal(err)
+	}
+	allowed = p.IsAllowedActions("", "", map[string][]string{})
+	if !allowed.Match(ServerInfoAdminAction) {
+		t.Fatal("expected ServerInfo allowed without resource")
+	}
+
+	// admin:* without Resource stays backward compatible for resource-less actions.
+	wildcardPolicy := `{
+ "Version": "2012-10-17",
+ "Statement": [
+  {
+   "Effect": "Allow",
+   "Action": ["admin:*"]
+  }
+ ]
+}`
+	p, err = ParseConfig(strings.NewReader(wildcardPolicy))
+	if err != nil {
+		t.Fatal(err)
+	}
+	allowed = p.IsAllowedActions("", "", map[string][]string{})
+	if !allowed.Match(ServerInfoAdminAction) {
+		t.Fatal("expected ServerInfo allowed with admin:* and no resource")
+	}
+	if !allowed.Match(GetBucketQuotaAdminAction) {
+		t.Fatal("expected GetBucketQuota allowed with admin:* and no resource constraint")
+	}
+}
+
+func TestAdminActionHasResource(t *testing.T) {
+	// Bucket-scoped actions must report HasResource.
+	bucketScoped := []AdminAction{
+		SetBucketQuotaAdminAction,
+		GetBucketQuotaAdminAction,
+		SetBucketTargetAction,
+		GetBucketTargetAction,
+		ReplicationDiff,
+		ImportBucketMetadataAction,
+		ExportBucketMetadataAction,
+		HealAdminAction,
+		InventoryControlAction,
+	}
+	for _, a := range bucketScoped {
+		if !a.HasResource() {
+			t.Errorf("expected %s to have resource", a)
+		}
+	}
+
+	// Resource-less actions must not.
+	resourceless := []AdminAction{
+		ServerInfoAdminAction,
+		ListUsersAdminAction,
+		ConfigUpdateAdminAction,
+		CreateUserAdminAction,
+	}
+	for _, a := range resourceless {
+		if a.HasResource() {
+			t.Errorf("expected %s to not have resource", a)
+		}
+	}
+}
+
+func TestParseConfigStrictRejectsResourceConflict(t *testing.T) {
+	// Strict parsing rejects admin statements with both Resource and NotResource.
+	conflicting := `{
+ "Version": "2012-10-17",
+ "Statement": [
+  {
+   "Effect": "Allow",
+   "Action": ["admin:GetBucketQuota"],
+   "Resource": ["arn:aws:s3:::mybucket"],
+   "NotResource": ["arn:aws:s3:::otherbucket"]
+  }
+ ]
+}`
+	// Permissive parse succeeds (backward compat).
+	_, err := ParseConfig(strings.NewReader(conflicting))
+	if err != nil {
+		t.Fatalf("permissive parse should succeed, got: %v", err)
+	}
+
+	// Strict parse rejects.
+	_, err = ParseConfigStrict(strings.NewReader(conflicting))
+	if err == nil {
+		t.Fatal("strict parse should reject Resource + NotResource in admin statement")
+	}
+
+	// Resource-less admin action with no resources is fine in strict mode.
+	clean := `{
+ "Version": "2012-10-17",
+ "Statement": [
+  {
+   "Effect": "Allow",
+   "Action": ["admin:ServerInfo"]
+  }
+ ]
+}`
+	_, err = ParseConfigStrict(strings.NewReader(clean))
+	if err != nil {
+		t.Fatalf("strict parse should accept clean admin statement, got: %v", err)
+	}
+
+	// Bucket-scoped admin action with valid Resource is fine in strict mode.
+	scoped := `{
+ "Version": "2012-10-17",
+ "Statement": [
+  {
+   "Effect": "Allow",
+   "Action": ["admin:GetBucketQuota"],
+   "Resource": ["arn:aws:s3:::mybucket"]
+  }
+ ]
+}`
+	_, err = ParseConfigStrict(strings.NewReader(scoped))
+	if err != nil {
+		t.Fatalf("strict parse should accept scoped admin statement, got: %v", err)
+	}
+}
+
+func TestMixedActionTypesRejected(t *testing.T) {
+	mixed := `{
+ "Version": "2012-10-17",
+ "Statement": [
+  {
+   "Effect": "Allow",
+   "Action": ["s3:GetObject", "admin:ServerInfo"],
+   "Resource": ["arn:aws:s3:::mybucket/*"]
+  }
+ ]
+}`
+	_, err := ParseConfig(strings.NewReader(mixed))
+	if err == nil {
+		t.Fatal("expected error for mixed s3+admin actions in same statement")
 	}
 }

@@ -6,21 +6,22 @@ all: test
 
 getdeps:
 	@mkdir -p ${GOPATH}/bin
-	@echo "Installing golangci-lint" && curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(GOPATH)/bin
+	@echo "Installing golangci-lint" && go install tool
 
 lint: getdeps
 	@echo "Running $@ check"
-	@${GOPATH}/bin/golangci-lint cache clean
 	@${GOPATH}/bin/golangci-lint run --build-tags kqueue --timeout=10m --config ./.golangci.yml
 
 lint-fix: getdeps
 	@echo "Running $@ check"
-	@${GOPATH}/bin/golangci-lint cache clean
 	@${GOPATH}/bin/golangci-lint run --build-tags kqueue --timeout=10m --config ./.golangci.yml --fix
 
 test: lint
 	@echo "Running unit tests"
 	@go test -race -tags kqueue ./...
+	@go test -tags kqueue,noasm ./...
+	@go test -tags kqueue,purego ./...
+	@go test -tags kqueue,nounsafe,noasm ./...
 
 test-ldap: lint
 	@echo "Running unit tests for LDAP with LDAP server at '"${LDAP_TEST_SERVER}"'"

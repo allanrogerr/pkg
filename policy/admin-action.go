@@ -19,6 +19,7 @@ package policy
 
 import (
 	"github.com/minio/pkg/v3/policy/condition"
+	"github.com/minio/pkg/v3/wildcard"
 )
 
 // AdminAction - admin policy action.
@@ -51,10 +52,18 @@ const (
 	TraceAdminAction = "admin:ServerTrace"
 	// ConsoleLogAdminAction - allow listing console logs on terminal
 	ConsoleLogAdminAction = "admin:ConsoleLog"
+	// KMSEnableAdminAction - allow enabling the builtin KMS
+	KMSEnableAdminAction = "admin:KMSEnable"
+	// KMSBackupAdminAction - allow backing up builtin KMS keys
+	KMSBackupAdminAction = "admin:KMSBackup"
+	// KMSRestoreAdminAction - allow restoring builtin KMS keys
+	KMSRestoreAdminAction = "admin:KMSRestore"
 	// KMSCreateKeyAdminAction - allow creating a new KMS master key
 	KMSCreateKeyAdminAction = "admin:KMSCreateKey"
 	// KMSKeyStatusAdminAction - allow getting KMS key status
 	KMSKeyStatusAdminAction = "admin:KMSKeyStatus"
+	// KMSKeyRotateAdminAction - allow rotating KMS keys
+	KMSKeyRotateAdminAction = "admin:KMSKeyRotate"
 	// ServerInfoAdminAction - allow listing server info
 	ServerInfoAdminAction = "admin:ServerInfo"
 	// HealthInfoAdminAction - allow obtaining cluster health information
@@ -92,6 +101,8 @@ const (
 	DisableUserAdminAction = "admin:DisableUser"
 	// GetUserAdminAction - allows GET permission on user info
 	GetUserAdminAction = "admin:GetUser"
+	// ChangeMyPasswordAdminAction - allow changing own password
+	ChangeMyPasswordAdminAction = "admin:ChangeMyPassword"
 
 	// Cluster Replicate Actions
 
@@ -108,6 +119,19 @@ const (
 	// SiteReplicationOperationAction - allow performing site replication
 	// create/update/delete operations to peers
 	SiteReplicationOperationAction = "admin:SiteReplicationOperation"
+
+	// Tables Replication Actions
+
+	// TablesReplicationAddAction - allow adding tables replication targets
+	TablesReplicationAddAction = "admin:TablesReplicationAdd"
+	// TablesReplicationRemoveAction - allow removing tables replication targets
+	TablesReplicationRemoveAction = "admin:TablesReplicationRemove"
+	// TablesReplicationInfoAction - allow getting tables replication info/status
+	TablesReplicationInfoAction = "admin:TablesReplicationInfo"
+	// TablesReplicationStartFailoverAction - allow starting tables replication failover
+	TablesReplicationStartFailoverAction = "admin:TablesReplicationStartFailover"
+	// TablesReplicationCatalogAdminAction - allow catalog debugging operations (reset, dump contents)
+	TablesReplicationCatalogAdminAction = "admin:TablesReplicationCatalogAdmin"
 
 	// Service account Actions
 
@@ -239,6 +263,39 @@ const (
 
 	// DriveInfoAction - allow drive specific summary and detail
 	DriveInfoAction = "admin:DriveInfo"
+
+	// Delta Sharing Actions
+
+	// DeltaSharingAdminAction - allow managing Delta Sharing shares and tokens
+	DeltaSharingAdminAction = "admin:DeltaSharing"
+	// DeltaSharingCreateShareAction - allow creating Delta Sharing shares
+	DeltaSharingCreateShareAction = "admin:DeltaSharingCreateShare"
+	// DeltaSharingDeleteShareAction - allow deleting Delta Sharing shares
+	DeltaSharingDeleteShareAction = "admin:DeltaSharingDeleteShare"
+	// DeltaSharingListSharesAction - allow listing Delta Sharing shares
+	DeltaSharingListSharesAction = "admin:DeltaSharingListShares"
+	// DeltaSharingGetShareAction - allow getting Delta Sharing share details
+	DeltaSharingGetShareAction = "admin:DeltaSharingGetShare"
+	// DeltaSharingUpdateShareAction - allow updating Delta Sharing shares
+	DeltaSharingUpdateShareAction = "admin:DeltaSharingUpdateShare"
+	// DeltaSharingCreateTokenAction - allow creating Delta Sharing tokens
+	DeltaSharingCreateTokenAction = "admin:DeltaSharingCreateToken"
+	// DeltaSharingDeleteTokenAction - allow deleting Delta Sharing tokens
+	DeltaSharingDeleteTokenAction = "admin:DeltaSharingDeleteToken"
+	// DeltaSharingListTokensAction - allow listing Delta Sharing tokens
+	DeltaSharingListTokensAction = "admin:DeltaSharingListTokens"
+	// ReadAlertsAction - allow reading stored alerts
+	ReadAlertsAction = "admin:ReadAlerts"
+
+	// Log Actions
+
+	// ReadAPILogsAction - allow reading stored API logs
+	ReadAPILogsAction = "admin:ReadAPILogs"
+	// ReadErrorLogsAction - allow reading stored error logs
+	ReadErrorLogsAction = "admin:ReadErrorLogs"
+	// ReadAuditLogsAction - allow reading stored audit logs
+	ReadAuditLogsAction = "admin:ReadAuditLogs"
+
 	// AllAdminActions - provides all admin permissions
 	AllAdminActions = "admin:*"
 )
@@ -271,6 +328,7 @@ var SupportedAdminActions = map[AdminAction]struct{}{
 	EnableUserAdminAction:            {},
 	DisableUserAdminAction:           {},
 	GetUserAdminAction:               {},
+	ChangeMyPasswordAdminAction:      {},
 	AddUserToGroupAdminAction:        {},
 	RemoveUserFromGroupAdminAction:   {},
 	GetGroupAdminAction:              {},
@@ -304,15 +362,24 @@ var SupportedAdminActions = map[AdminAction]struct{}{
 	SiteReplicationRemoveAction:      {},
 	SiteReplicationResyncAction:      {},
 
+	TablesReplicationAddAction:           {},
+	TablesReplicationRemoveAction:        {},
+	TablesReplicationInfoAction:          {},
+	TablesReplicationStartFailoverAction: {},
+	TablesReplicationCatalogAdminAction:  {},
+
 	ImportBucketMetadataAction: {},
 	ExportBucketMetadataAction: {},
 	ExportIAMAction:            {},
 	ImportIAMAction:            {},
 
+	ForceUnlockAdminAction: {},
+
 	ListBatchJobsAction:    {},
 	DescribeBatchJobAction: {},
 	StartBatchJobAction:    {},
 	CancelBatchJobAction:   {},
+	GenerateBatchJobAction: {},
 
 	InventoryControlAction: {},
 
@@ -327,13 +394,64 @@ var SupportedAdminActions = map[AdminAction]struct{}{
 
 	ServiceCordonAdminAction: {},
 
+	DeltaSharingAdminAction:       {},
+	DeltaSharingCreateShareAction: {},
+	DeltaSharingDeleteShareAction: {},
+	DeltaSharingListSharesAction:  {},
+	DeltaSharingGetShareAction:    {},
+	DeltaSharingUpdateShareAction: {},
+	DeltaSharingCreateTokenAction: {},
+	DeltaSharingDeleteTokenAction: {},
+	DeltaSharingListTokensAction:  {},
+
+	ReadAPILogsAction:   {},
+	ReadErrorLogsAction: {},
+	ReadAuditLogsAction: {},
+	ReadAlertsAction:    {},
+
 	AllAdminActions: {},
+}
+
+// AdminActionsWithResource enumerates admin actions that operate on
+// a specific bucket resource. When a policy statement contains one of
+// these actions *and* specifies a Resource, the resource is enforced
+// against the target bucket. All other admin actions are resource-less;
+// any Resource specified in the statement is ignored for them.
+var AdminActionsWithResource = map[AdminAction]struct{}{
+	SetBucketQuotaAdminAction:  {},
+	GetBucketQuotaAdminAction:  {},
+	SetBucketTargetAction:      {},
+	GetBucketTargetAction:      {},
+	ReplicationDiff:            {},
+	ImportBucketMetadataAction: {},
+	ExportBucketMetadataAction: {},
+	HealAdminAction:            {},
+	InventoryControlAction:     {},
+}
+
+// HasResource reports whether this admin action operates on a bucket resource.
+func (action AdminAction) HasResource() bool {
+	for a := range AdminActionsWithResource {
+		if action.Match(a) {
+			return true
+		}
+	}
+	return false
+}
+
+// Match - matches action name with action pattern.
+func (action AdminAction) Match(a AdminAction) bool {
+	return wildcard.Match(string(action), string(a))
 }
 
 // IsValid - checks if action is valid or not.
 func (action AdminAction) IsValid() bool {
-	_, ok := SupportedAdminActions[action]
-	return ok
+	for supAction := range SupportedAdminActions {
+		if action.Match(supAction) {
+			return true
+		}
+	}
+	return false
 }
 
 func createAdminActionConditionKeyMap() map[Action]condition.KeySet {
